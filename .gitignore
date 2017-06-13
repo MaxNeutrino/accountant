@@ -5,3 +5,5 @@ gradle/
 html/
 *.iml
 db.properties
+
+credentials.properties
