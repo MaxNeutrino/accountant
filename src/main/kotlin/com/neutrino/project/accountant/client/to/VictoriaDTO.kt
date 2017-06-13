@@ -7,6 +7,7 @@ data class VictoriaDTO(
         var maleId: String = "-1",
         var femaleName: String = "-1",
         var femaleId: String = "-1",
+        var orderDate: String = "-1",
         var orderItems: MutableList<String> = mutableListOf<String>(),
         var totalPrice: String = "-1"
 )
@@ -19,6 +20,7 @@ data class VictoriaDTO(
                 "maleId : $maleId \n" +
                 "femaleName: $femaleName \n" +
                 "femaleId: $femaleId \n" +
+                "orderDate: $orderDate \n" +
                 "orderItems: $orderItems \n" +
                 "totalPrice: $totalPrice \n"
     }
