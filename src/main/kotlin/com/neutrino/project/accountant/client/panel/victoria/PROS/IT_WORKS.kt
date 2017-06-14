@@ -1,12 +1,9 @@
-package com.neutrino.project.accountant.client.panel.victoria
+package com.neutrino.project.accountant.client.panel.victoria.PROS
 
 import com.neutrino.project.accountant.client.Client
 import com.neutrino.project.accountant.client.ReactiveClient
 import com.neutrino.project.accountant.client.model.Site
-import com.neutrino.project.accountant.client.panel.victoria.PROS.authorize
-import com.neutrino.project.accountant.client.panel.victoria.PROS.getDTOwithGiftOrder
-import com.neutrino.project.accountant.client.panel.victoria.PROS.getDTOwithIdentity
-import com.neutrino.project.accountant.client.panel.victoria.PROS.setDateParams
+import com.neutrino.project.accountant.client.panel.victoria.VictoriaLoginForm
 import com.neutrino.project.accountant.client.panel.victoria.http.VictoriaAuthHttp
 import com.neutrino.project.accountant.client.panel.victoria.service.VictoriaAuthService
 import com.neutrino.project.accountant.client.to.VictoriaDTO
@@ -14,10 +11,11 @@ import com.neutrino.project.accountant.client.util.ClientUtil
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.*
 
-class DIDIT
+class IT_WORKS
 {
     fun getVictoriaDTOs(fromDate: LocalDate, toDate: LocalDate) : Flux<VictoriaDTO>
     {
@@ -33,14 +31,14 @@ class DIDIT
             val giftRows = dirtyGiftRows.subList(3, dirtyGiftRows.size)
 
             Flux.fromIterable(giftRows).map {
-                var d = VictoriaDTO()
-                d = getDTOwithIdentity(d, it)
-                d = getDTOwithGiftOrder(d, it, client)
-                d
+                var dto = Mono.just<VictoriaDTO>(VictoriaDTO())
+                dto = getDTOwithIdentity(dto, it)
+                dto = getDTOwithGiftOrder(dto, it, client)
+                dto
             }
         }
 
-        return allDTOs
+        return allDTOs.flatMap { it }
     }
 
     private fun authorize() : ReactiveClient
@@ -68,48 +66,50 @@ class DIDIT
         return map
     }
 
-    private fun getDTOwithIdentity(vicDTO: VictoriaDTO, it: Element) : VictoriaDTO
-    {
-        vicDTO.operatorId = it.child(0).text()
-        vicDTO.operatorEmail = it.child(1).text()
+    private fun getDTOwithIdentity(vicDTO: Mono<VictoriaDTO>, siteElement: Element) : Mono<VictoriaDTO> = vicDTO.map {
+            it.operatorId = siteElement.child(0).text();
+            it.operatorEmail = siteElement.child(1).text()
 
-        // once there was an exception when the name was empty
-        val fullManData = it.child(2).text()
-        if (fullManData.length == 9)
-        {
-            vicDTO.maleName = ""
-            vicDTO.maleId = fullManData.substring(1, 8)
-        }
-        else
-        {
-            vicDTO.maleName = fullManData.substring(0, fullManData.indexOf("(") - 1)
-            vicDTO.maleId = fullManData.substring(fullManData.indexOf("(") + 1, fullManData.indexOf(")"))
-        }
+            // once there was an exception when the name was empty
+            val fullManData = siteElement.child(2).text()
+            if (fullManData.length == 9)
+            {
+                it.maleName = ""
+                it.maleId = fullManData.substring(1, 8)
+            }
+            else
+            {
+                it.maleName = fullManData.substring(0, fullManData.indexOf("(") - 1)
+                it.maleId = fullManData.substring(fullManData.indexOf("(") + 1, fullManData.indexOf(")"))
+            }
 
-        val fullFemaleData = it.child(3).text()
-        vicDTO.femaleName = fullFemaleData.substring(0, fullFemaleData.indexOf("(") - 1)
-        vicDTO.femaleId = fullFemaleData.substring(fullFemaleData.indexOf("(") + 1, fullFemaleData.indexOf(")"))
+            val fullFemaleData = siteElement.child(3).text()
+            it.femaleName = fullFemaleData.substring(0, fullFemaleData.indexOf("(") - 1)
+            it.femaleId = fullFemaleData.substring(fullFemaleData.indexOf("(") + 1, fullFemaleData.indexOf(")"))
 
-        vicDTO.orderDate = it.child(4).text();
+            it.orderDate = siteElement.child(4).text();
 
-        return vicDTO
+            it
     }
 
-    private fun getDTOwithGiftOrder(vicDTO: VictoriaDTO, it: Element, client: ReactiveClient) : VictoriaDTO
+
+    private fun getDTOwithGiftOrder(vicDTO: Mono<VictoriaDTO>, siteElement: Element, client: ReactiveClient) : Mono<VictoriaDTO>
     {
-        val orderDetailsPageURI = it.child(5).toString().substring(
-                it.child(5).toString().indexOf("\"") + 1,
-                it.child(5).toString().lastIndexOf("\""))
+        val orderDetailsPageURI = siteElement.child(5).toString().substring(
+                siteElement.child(5).toString().indexOf("\"") + 1,
+                siteElement.child(5).toString().lastIndexOf("\""))
 
         val vicOrderResponse = client.get("/manager/$orderDetailsPageURI")
 
-        vicOrderResponse.map {
+        val orderDTO = vicOrderResponse.map {
+            val tempOrderDTO = VictoriaDTO()
+
             val statusPage = ClientUtil.stringBodyAndClose(it)
             val statusDocument = Jsoup.parse(statusPage)
 
             val orderItems = statusDocument.getElementsByClass("col-md-5")
             val orderRows = orderItems.select("tr")
-            vicDTO.totalPrice = orderRows.last().child(1).text()
+            tempOrderDTO.totalPrice = orderRows.last().child(1).text()
             orderRows.removeAt(0)
             orderRows.remove(orderRows.last())
 
@@ -120,11 +120,20 @@ class DIDIT
                 val giftAgencyPrice = e.child(3).text().trim()
 
                 // separator is " : "
-                vicDTO.orderItems.add("$giftName : $giftAmount : $giftAgencyPrice")
+                tempOrderDTO.orderItems.add("$giftName : $giftAmount : $giftAgencyPrice")
             }
-        }.subscribe()
 
+            tempOrderDTO
+        }
 
-        return vicDTO
+        val res = Flux.zip(vicDTO, orderDTO).map {
+            val result = it.t1
+            result.totalPrice = it.t2.totalPrice
+            result.orderItems = it.t2.orderItems
+
+            result
+        }.next()
+
+        return res
     }
 }
