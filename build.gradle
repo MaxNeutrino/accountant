@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.2-2'
+    ext.kotlin_version = '1.1.2-5'
 
     repositories {
         mavenCentral()
@@ -39,4 +39,7 @@ dependencies {
     compileOnly 'com.pushtorefresh:javac-warning-annotation:1.0.0'
     compile group: 'org.jdbi', name: 'jdbi', version: '2.78'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.1.1'
+
+    compile group: 'org.apache.poi', name: 'poi', version: '3.16'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.16'
 }
