@@ -1,6 +1,6 @@
 package com.neutrino.project.accountant.client
 
-import com.neutrino.project.accountant.client.model.Site
+import com.neutrino.project.accountant.parser.model.Site
 
 
 object ClientFactory {

@@ -1,6 +1,6 @@
 package com.neutrino.project.accountant.database.memory
 
-import com.neutrino.project.accountant.client.model.Profile
+import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.database.ProfileRepository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono

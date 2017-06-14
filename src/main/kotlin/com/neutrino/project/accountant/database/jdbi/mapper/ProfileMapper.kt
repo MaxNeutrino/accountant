@@ -1,6 +1,6 @@
 package com.neutrino.project.accountant.database.jdbi.mapper
 
-import com.neutrino.project.accountant.client.model.Profile
+import com.neutrino.project.accountant.parser.model.Profile
 import org.skife.jdbi.v2.StatementContext
 import org.skife.jdbi.v2.tweak.ResultSetMapper
 import java.sql.ResultSet

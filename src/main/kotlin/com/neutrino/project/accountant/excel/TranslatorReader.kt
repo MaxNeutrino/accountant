@@ -1,7 +1,7 @@
 package com.neutrino.project.accountant.excel
 
-import com.neutrino.project.accountant.client.model.Statistic
-import com.neutrino.project.accountant.client.model.Translator
+import com.neutrino.project.accountant.parser.model.Statistic
+import com.neutrino.project.accountant.parser.model.Translator
 import com.neutrino.project.accountant.util.exception.ExcelParseException
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux
 import java.io.FileInputStream
 
 
-class TranslatorReader(val excel: String) {
+class TranslatorReader(excel: String) {
 
     val wb = WorkbookFactory.create(FileInputStream(excel))
     var sheet: Sheet? = null

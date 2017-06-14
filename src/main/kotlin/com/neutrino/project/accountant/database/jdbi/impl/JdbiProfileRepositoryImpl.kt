@@ -1,6 +1,6 @@
 package com.neutrino.project.accountant.database.jdbi.impl
 
-import com.neutrino.project.accountant.client.model.Profile
+import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.database.ProfileRepository
 import com.neutrino.project.accountant.database.jdbi.DbiManager
 import com.neutrino.project.accountant.database.jdbi.dbirepo.ProfileObjectRepository
