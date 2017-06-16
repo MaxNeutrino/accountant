@@ -17,13 +17,14 @@ class NatashaStatisticHandler(private val http: HttpController, dateRange: Pair<
     private val payParser = NatashaStatisticParser()
     private val form = NatashaStatisticForm(dateRange)
 
-    override fun handle(profiles: Flux<Profile>): Flux<StatisticTo> = profiles
+    override fun handle(params: Flux<Profile>): Flux<StatisticTo> = params
             .flatMap {
                 p ->
                 sendRequest(p.siteId)
                         .map {
                             StatisticTo(
                                     p.siteId,
+                                    "",
                                     payParser.parse(it).blockFirst())
                         }
             }

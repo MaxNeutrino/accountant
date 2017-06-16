@@ -10,26 +10,32 @@ import com.neutrino.project.accountant.util.ClientUtil
 import com.neutrino.project.accountant.util.exception.AuthException
 import com.neutrino.project.accountant.util.exception.BadCredentialException
 import okhttp3.Response
+import org.apache.logging.log4j.LogManager
 import reactor.core.publisher.Flux
 import java.time.LocalDate
 
 class RomanceService(val client: ReactiveClient, val dateRange: Pair<LocalDate, LocalDate>): ParserService {
 
-    val httpController = RomanceHttpController(client)
-    val listener = RomanceResponseListener()
+    private val logger = LogManager.getLogger(this)
 
-    val profileHandler = RomanceProfileHandler(httpController)
-    val statisticHandler = RomanceStatisticHandler(httpController)
+    private val httpController = RomanceHttpController(client)
+    private val listener = RomanceResponseListener()
+
+    private val profileHandler = RomanceProfileHandler(httpController)
+    private val statisticHandler = RomanceStatisticHandler(httpController)
 
     override fun auth(credential: LoginForm) {
+        logger.info("auth")
         httpController.requestAndSubscribe(credential.get(), listener)
     }
 
     override fun profilesImport(): Flux<Profile> {
+        logger.info("profilesImport")
         return profileHandler.handle(Unit)
     }
 
     override fun statistics(): Flux<Statistic> {
+        logger.info("statistics")
         return statisticHandler.handle(dateRange)
                 .map { ClientUtil.converStatistic(it, client.name()) }
     }
@@ -38,6 +44,7 @@ class RomanceService(val client: ReactiveClient, val dateRange: Pair<LocalDate, 
 
         @Throws(AuthException::class, BadCredentialException::class)
         override fun success(response: Response) {
+            logger.info(response)
             val page = ClientUtil.stringBodyAndClose(response)
 
             if (page!!.contains("Access denied! Please, log in")) {
@@ -50,7 +57,7 @@ class RomanceService(val client: ReactiveClient, val dateRange: Pair<LocalDate, 
         }
 
         override fun error(e: Throwable) {
-            e.printStackTrace()
+            logger.error("Error in request time", e)
         }
     }
 }

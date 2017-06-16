@@ -11,11 +11,14 @@ import com.neutrino.project.accountant.util.ClientUtil
 import com.neutrino.project.accountant.util.exception.AuthException
 import com.neutrino.project.accountant.util.exception.BadCredentialException
 import okhttp3.Response
+import org.apache.logging.log4j.LogManager
 import reactor.core.publisher.Flux
 import java.time.LocalDate
 
 
 class ChatOsService(private val client: ReactiveClient, private val dateRange: Pair<LocalDate, LocalDate>): ParserService {
+
+    private val logger = LogManager.getLogger(this)
 
     private val listener = ChatOsResponseListener()
     private val httpController = ChatOsHttpController(client)
@@ -24,20 +27,24 @@ class ChatOsService(private val client: ReactiveClient, private val dateRange: P
     private val anastasiaStatisticHandler = ChatOsAnastasiaStatisticHandler(client)
 
     override fun auth(credential: LoginForm) {
+        logger.info("auth")
         httpController.requestAndSubscribe(credential.get(), listener)
     }
 
     override fun profilesImport(): Flux<Profile> {
+        logger.info("profilesImport")
         return profileHandler.handle(Unit)
     }
 
     override fun statistics(): Flux<Statistic> {
+        logger.info("statistics")
         return anastasiaStatisticHandler.handle(dateRange)
     }
 
     inner class ChatOsResponseListener: ResponseListener {
 
         override fun success(response: Response) {
+            logger.info(response)
             val page = ClientUtil.stringBodyAndClose(response)
 
             if (page!!.contains("Для входа в личный кабинет, пожалуйста авторизируйтесь")) {
@@ -50,7 +57,7 @@ class ChatOsService(private val client: ReactiveClient, private val dateRange: P
         }
 
         override fun error(e: Throwable) {
-            e.printStackTrace()
+            logger.error("Error in request time", e)
         }
     }
 }

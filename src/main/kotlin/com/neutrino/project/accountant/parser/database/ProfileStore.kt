@@ -2,9 +2,9 @@ package com.neutrino.project.accountant.parser.database
 
 import com.neutrino.project.accountant.database.jdbi.impl.JdbiProfileRepositoryImpl
 import com.neutrino.project.accountant.database.memory.InMemoryProfileRepositoryImpl
+import com.neutrino.project.accountant.parser.ParserService
 import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.parser.model.Site
-import com.neutrino.project.accountant.parser.panel.chatos.ChatOsProfileParserHandler
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -26,8 +26,8 @@ object ProfileStore {
         return memory.getAll()
     }
 
-    fun import(profileImport: ChatOsProfileParserHandler) {
-        memory.saveAll(profileImport.handle(Unit))
+    fun import(parserService: ParserService) {
+        memory.saveAll(parserService.profilesImport())
     }
 
     fun getBySite(site: Site): Flux<Profile> {

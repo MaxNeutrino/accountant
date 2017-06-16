@@ -5,7 +5,7 @@ class Statistic {
 
     val profile: Profile
     val panelName: String
-    val pay: Double
+    var pay: Double
 
     constructor(profile: Profile, panelName: String, pay: Double) {
         this.profile = profile

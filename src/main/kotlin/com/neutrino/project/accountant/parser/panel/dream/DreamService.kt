@@ -10,11 +10,14 @@ import com.neutrino.project.accountant.util.ClientUtil
 import com.neutrino.project.accountant.util.exception.AuthException
 import com.neutrino.project.accountant.util.exception.BadCredentialException
 import okhttp3.Response
+import org.apache.logging.log4j.LogManager
 import reactor.core.publisher.Flux
 import java.time.LocalDate
 
 
 class DreamService(private val client: ReactiveClient, private val dateRange: Pair<LocalDate, LocalDate>): ParserService {
+
+    private val logger = LogManager.getLogger(this)
 
     private val httpController = DreamHttpController(client)
     private val listener = DreamResponseListener()
@@ -23,14 +26,17 @@ class DreamService(private val client: ReactiveClient, private val dateRange: Pa
     private val statisticHandler = DreamStatisticHandler(httpController)
 
     override fun auth(credential: LoginForm) {
+        logger.info("auth")
         httpController.requestAndSubscribe(credential.get(), listener)
     }
 
     override fun profilesImport(): Flux<Profile> {
+        logger.info("profilesImport")
         return profileHandler.handle(Unit)
     }
 
     override fun statistics(): Flux<Statistic> {
+        logger.info("statistics")
         return statisticHandler.handle(dateRange)
                 .map {
                     ClientUtil.converStatistic(it, client.name())
@@ -40,6 +46,7 @@ class DreamService(private val client: ReactiveClient, private val dateRange: Pa
     inner class DreamResponseListener : ResponseListener {
 
         override fun success(response: Response) {
+            logger.info(response)
             val page = ClientUtil.stringBodyAndClose(response)
 
             if (page!!.contains("Неправильная комбинация логин")) {
@@ -52,7 +59,7 @@ class DreamService(private val client: ReactiveClient, private val dateRange: Pa
         }
 
         override fun error(e: Throwable) {
-            e.printStackTrace()
+            logger.error("Error in request time", e)
         }
     }
 }

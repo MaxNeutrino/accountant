@@ -3,6 +3,7 @@ package com.neutrino.project.accountant.excel
 import com.neutrino.project.accountant.parser.model.Statistic
 import com.neutrino.project.accountant.parser.model.Translator
 import com.neutrino.project.accountant.util.exception.ExcelParseException
+import org.apache.logging.log4j.LogManager
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
@@ -12,10 +13,13 @@ import java.io.FileInputStream
 
 class TranslatorReader(excel: String) {
 
+    private val logger = LogManager.getLogger(this)
+
     val wb = WorkbookFactory.create(FileInputStream(excel))
     var sheet: Sheet? = null
 
     fun readSheet(sheetName: String) {
+        logger.info("readSheet $sheetName")
         sheet = wb.getSheet(sheetName)
     }
 
@@ -33,6 +37,7 @@ class TranslatorReader(excel: String) {
 
 
     fun readTranslator(statistics: Flux<Statistic>): Flux<Statistic> {
+        logger.info("readTranslator")
         val translatorsName = readPosition("Переводчик")
 
         return statistics.map {

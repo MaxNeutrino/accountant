@@ -41,7 +41,7 @@ class DreamStatisticHandler(private val httpController: HttpController) : Parser
         private fun convert(element: Element): StatisticTo {
             val info = element.getElementsByTag("td")
             var id = info.first().text()
-            id = id.substring(1, id.indexOf("]") + 1)
+            id = id.substring(1, id.indexOf("]"))
 
             val pay = info.last().text().trim().replace("$", "")
 

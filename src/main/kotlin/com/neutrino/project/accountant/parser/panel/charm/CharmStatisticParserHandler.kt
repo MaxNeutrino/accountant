@@ -17,10 +17,13 @@ class CharmStatisticParserHandler(private val httpController: HttpController, pr
     private val nextPageParser = CharmNextPageParser()
     private var form: CharmStatisticForm? = null
 
-    override fun handle(profiles: Flux<Profile>): Flux<StatisticTo> {
+    /**
+     * Pay is credits
+     */
+    override fun handle(params: Flux<Profile>): Flux<StatisticTo> {
         form = CharmStatisticForm(dateRange)
 
-        return profiles.map {
+        return params.map {
             StatisticTo(it.siteId, "", sum(calculate(it)).toString())
         }
     }

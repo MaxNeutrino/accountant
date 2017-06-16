@@ -9,6 +9,7 @@ import com.neutrino.project.accountant.parser.form.LoginForm
 import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.parser.model.Site
 import com.neutrino.project.accountant.parser.model.Statistic
+import com.neutrino.project.accountant.parser.panel.natasha.NatashaService.AuthHandler
 import com.neutrino.project.accountant.parser.panel.natasha.form.NatashaCodeLoginForm
 import com.neutrino.project.accountant.parser.panel.natasha.form.NatashaLastAutoGenLoginForm
 import com.neutrino.project.accountant.parser.panel.natasha.form.NatashaLoginForm
@@ -16,11 +17,18 @@ import com.neutrino.project.accountant.util.ClientUtil
 import com.neutrino.project.accountant.util.exception.AuthException
 import com.neutrino.project.accountant.util.exception.BadCredentialException
 import okhttp3.Response
+import org.apache.logging.log4j.LogManager
 import reactor.core.publisher.Flux
 import java.time.LocalDate
 
-
+/**
+ * Use inner class AuthHandler instead this service
+ *
+ * @see AuthHandler
+ */
 class NatashaService(private val client: ReactiveClient, val dateRange: Pair<LocalDate, LocalDate>): ParserService {
+
+    private val logger = LogManager.getLogger(this)
 
     private var cookieFlag: Boolean = false
 
@@ -30,7 +38,7 @@ class NatashaService(private val client: ReactiveClient, val dateRange: Pair<Loc
 
     private var httpController = NatashaHttpController(client)
 
-    private val authHandler = AuthHandler()
+    val authHandler = AuthHandler()
 
     private val profileHandler = NatashaProfileHandler(httpController)
     private val statisticHandler = NatashaStatisticHandler(httpController, dateRange)
@@ -44,6 +52,8 @@ class NatashaService(private val client: ReactiveClient, val dateRange: Pair<Loc
      */
     @Throws(AuthException::class, BadCredentialException::class)
     override fun auth(credential: LoginForm) {
+        logger.info("auth")
+
         if (!cookieFlag) {
             if (cookieCheck()) {
                 auth(credential.get())
@@ -54,13 +64,17 @@ class NatashaService(private val client: ReactiveClient, val dateRange: Pair<Loc
     }
 
     override fun profilesImport(): Flux<Profile> {
+        logger.info("profilesImport")
         return profileHandler.handle(Unit)
     }
 
     override fun statistics(): Flux<Statistic> {
+        logger.info("statistics")
         val profiles = ProfileStore.getBySite(Site.NATASHA)
         return statisticHandler.handle(profiles)
-                .map { ClientUtil.converStatistic(it, client.name()) }
+                .map {
+                    //println(it)
+                    ClientUtil.converStatistic(it, client.name()) }
     }
 
     fun code(code: String) {
@@ -91,6 +105,7 @@ class NatashaService(private val client: ReactiveClient, val dateRange: Pair<Loc
 
         @Throws(AuthException::class, BadCredentialException::class)
         override fun success(response: Response) {
+            logger.info(response)
             val page = ClientUtil.stringBodyAndClose(response)
 
             if (!authHandler.last) {
@@ -109,7 +124,7 @@ class NatashaService(private val client: ReactiveClient, val dateRange: Pair<Loc
         }
 
         override fun error(e: Throwable) {
-            e.printStackTrace()
+            logger.error("Error in request time", e)
         }
     }
 

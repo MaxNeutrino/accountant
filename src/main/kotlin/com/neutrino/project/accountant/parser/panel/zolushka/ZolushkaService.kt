@@ -12,12 +12,15 @@ import com.neutrino.project.accountant.util.exception.AuthException
 import com.neutrino.project.accountant.util.exception.BadCredentialException
 import com.pushtorefresh.javac_warning_annotation.Warning
 import okhttp3.Response
+import org.apache.logging.log4j.LogManager
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 
 class ZolushkaService(private val client: ReactiveClient, private val dateRange: Pair<LocalDate, LocalDate>): ParserService {
+
+    private val logger = LogManager.getLogger(this)
 
     private var isLastLoggedIn: Boolean = false
     private val listener = ZolushkaResponseListener()
@@ -26,16 +29,19 @@ class ZolushkaService(private val client: ReactiveClient, private val dateRange:
     private val statisticHandler = ZolushkaStatisticHandler(httpController, Pair(1.0, 1.0))
 
     override fun auth(credential: LoginForm) {
+        logger.info("auth")
         isLastLoggedIn = false
-        httpController.requestAndSubscribeTerms(credential.get(), listener)
+        httpController.requestAndSubscribe(credential.get(), listener)
     }
 
     @Warning("Return empty")
     override fun profilesImport(): Flux<Profile> {
+        logger.info("profilesImport")
         return Flux.empty()
     }
 
     override fun statistics(): Flux<Statistic> {
+        logger.info("statistics")
         return statisticHandler.handle(dateRange)
                 .map { ClientUtil.converStatistic(it, client.name()) }
     }
@@ -57,6 +63,7 @@ class ZolushkaService(private val client: ReactiveClient, private val dateRange:
     inner class ZolushkaResponseListener: ResponseListener {
 
         override fun success(response: Response) {
+            logger.info(response)
             val page = ClientUtil.stringBodyAndClose(response)
 
             if (page!!.contains("Username/Password is incorrect"))
@@ -80,7 +87,7 @@ class ZolushkaService(private val client: ReactiveClient, private val dateRange:
         }
 
         override fun error(e: Throwable) {
-            e.printStackTrace()
+            logger.error("Error in request time", e)
         }
     }
 

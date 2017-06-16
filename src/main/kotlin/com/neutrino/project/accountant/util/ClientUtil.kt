@@ -30,8 +30,9 @@ object ClientUtil {
 
     fun converStatistic(to: StatisticTo, panelName: String): Statistic {
         val profile = ProfileStore.get(to.profile!!).block()
+
         if (profile.translator == null)
-            profile.translator = Translator(profile.translator)
+            profile.translator = Translator(to.translator)
 
         return Statistic(
                 profile,

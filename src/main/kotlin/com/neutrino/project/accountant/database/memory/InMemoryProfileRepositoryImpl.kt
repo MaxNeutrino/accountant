@@ -1,7 +1,7 @@
 package com.neutrino.project.accountant.database.memory
 
-import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.database.ProfileRepository
+import com.neutrino.project.accountant.parser.model.Profile
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -42,6 +42,7 @@ object InMemoryProfileRepositoryImpl : ProfileRepository {
 
     private fun save(profile: Profile) {
         if (store.contains(profile.siteId)) {
+
             store[profile.siteId]!!.site = profile.site
 
             if (profile.translator != null) {

@@ -1,8 +1,8 @@
 package com.neutrino.project.accountant.parser.panel.chatos.support.anastasia
 
+import com.neutrino.project.accountant.client.ReactiveClient
 import com.neutrino.project.accountant.parser.HtmlParser
 import com.neutrino.project.accountant.parser.ParserHandler
-import com.neutrino.project.accountant.client.ReactiveClient
 import com.neutrino.project.accountant.parser.model.Statistic
 import com.neutrino.project.accountant.parser.to.StatisticTo
 import com.neutrino.project.accountant.util.ClientUtil

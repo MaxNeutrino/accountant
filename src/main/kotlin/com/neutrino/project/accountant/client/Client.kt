@@ -1,12 +1,16 @@
 package com.neutrino.project.accountant.client
 
 import okhttp3.*
+import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.net.CookieManager
 import java.net.CookiePolicy
 
 
+
 class Client(val baseUrl: String, val name: String) {
+
+    private val logger = LogManager.getLogger(this)
 
     private var cookieManager: CookieManager? = null
 
@@ -16,6 +20,7 @@ class Client(val baseUrl: String, val name: String) {
             .build()
 
     fun get(url: String): Response {
+        //logger.info("$name - GET url = $url")
         return executeRequest(
                 Builder("$baseUrl$url", HashMap())
                         .buildGet()
@@ -23,6 +28,7 @@ class Client(val baseUrl: String, val name: String) {
     }
 
     fun get(url: String, params: Map<String, String>): Response {
+        //logger.info("$name - GET url = $url")
         return executeRequest(
                 Builder("$baseUrl$url", params)
                         .buildGet()
@@ -30,6 +36,7 @@ class Client(val baseUrl: String, val name: String) {
     }
 
     fun post(url: String, params: Map<String, String>): Response {
+        //logger.info("$name - POST url = $url")
         return executeRequest(
                 Builder("$baseUrl$url", params)
                         .buildPost()
@@ -37,6 +44,7 @@ class Client(val baseUrl: String, val name: String) {
     }
 
     fun post(url: String, params: Pair<String, String>): Response {
+        //logger.info("$name - POST url = $url")
         return executeRequest(
                 Builder("$baseUrl$url", mapOf(params.first to params.second))
                         .buildPost()

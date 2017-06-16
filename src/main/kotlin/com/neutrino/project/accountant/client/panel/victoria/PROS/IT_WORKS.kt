@@ -1,13 +1,9 @@
 package com.neutrino.project.accountant.client.panel.victoria.PROS
 
-import com.neutrino.project.accountant.client.Client
+
 import com.neutrino.project.accountant.client.ReactiveClient
-import com.neutrino.project.accountant.client.model.Site
-import com.neutrino.project.accountant.client.panel.victoria.VictoriaLoginForm
-import com.neutrino.project.accountant.client.panel.victoria.http.VictoriaAuthHttp
-import com.neutrino.project.accountant.client.panel.victoria.service.VictoriaAuthService
-import com.neutrino.project.accountant.client.to.VictoriaDTO
-import com.neutrino.project.accountant.client.util.ClientUtil
+import com.neutrino.project.accountant.parser.to.VictoriaDTO
+import com.neutrino.project.accountant.util.ClientUtil
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import reactor.core.publisher.Flux
@@ -15,11 +11,10 @@ import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.*
 
-class IT_WORKS
-{
-    fun getVictoriaDTOs(fromDate: LocalDate, toDate: LocalDate) : Flux<VictoriaDTO>
-    {
-        val client = authorize()
+class IT_WORKS(private val client: ReactiveClient) {
+
+    fun getVictoriaDTOs(fromDate: LocalDate, toDate: LocalDate): Flux<VictoriaDTO> {
+        //val client = authorize()
         val dateParams = setDateParams(fromDate, toDate)
         val vicResponse = client.post("/manager/real-gifts-list", dateParams)
 
@@ -41,7 +36,7 @@ class IT_WORKS
         return allDTOs.flatMap { it }
     }
 
-    private fun authorize() : ReactiveClient
+    /*private fun authorize() : ReactiveClient
     {
         val prop = Properties()
         prop.load(VictoriaDTO::class.java.getResourceAsStream("/credentials.properties"))
@@ -52,11 +47,10 @@ class IT_WORKS
         authService.auth(form)
 
         return client
-    }
+    }*/
 
 
-    private fun  setDateParams(fromDate: LocalDate, toDate: LocalDate): HashMap<String, String>
-    {
+    private fun setDateParams(fromDate: LocalDate, toDate: LocalDate): HashMap<String, String> {
         val map = HashMap<String, String>()
         map.put("id_female", "0")
         map.put("status", "0")
@@ -66,35 +60,31 @@ class IT_WORKS
         return map
     }
 
-    private fun getDTOwithIdentity(vicDTO: Mono<VictoriaDTO>, siteElement: Element) : Mono<VictoriaDTO> = vicDTO.map {
-            it.operatorId = siteElement.child(0).text();
-            it.operatorEmail = siteElement.child(1).text()
+    private fun getDTOwithIdentity(vicDTO: Mono<VictoriaDTO>, siteElement: Element): Mono<VictoriaDTO> = vicDTO.map {
+        it.operatorId = siteElement.child(0).text();
+        it.operatorEmail = siteElement.child(1).text()
 
-            // once there was an exception when the name was empty
-            val fullManData = siteElement.child(2).text()
-            if (fullManData.length == 9)
-            {
-                it.maleName = ""
-                it.maleId = fullManData.substring(1, 8)
-            }
-            else
-            {
-                it.maleName = fullManData.substring(0, fullManData.indexOf("(") - 1)
-                it.maleId = fullManData.substring(fullManData.indexOf("(") + 1, fullManData.indexOf(")"))
-            }
+        // once there was an exception when the name was empty
+        val fullManData = siteElement.child(2).text()
+        if (fullManData.length == 9) {
+            it.maleName = ""
+            it.maleId = fullManData.substring(1, 8)
+        } else {
+            it.maleName = fullManData.substring(0, fullManData.indexOf("(") - 1)
+            it.maleId = fullManData.substring(fullManData.indexOf("(") + 1, fullManData.indexOf(")"))
+        }
 
-            val fullFemaleData = siteElement.child(3).text()
-            it.femaleName = fullFemaleData.substring(0, fullFemaleData.indexOf("(") - 1)
-            it.femaleId = fullFemaleData.substring(fullFemaleData.indexOf("(") + 1, fullFemaleData.indexOf(")"))
+        val fullFemaleData = siteElement.child(3).text()
+        it.femaleName = fullFemaleData.substring(0, fullFemaleData.indexOf("(") - 1)
+        it.femaleId = fullFemaleData.substring(fullFemaleData.indexOf("(") + 1, fullFemaleData.indexOf(")"))
 
-            it.orderDate = siteElement.child(4).text();
+        it.orderDate = siteElement.child(4).text();
 
-            it
+        it
     }
 
 
-    private fun getDTOwithGiftOrder(vicDTO: Mono<VictoriaDTO>, siteElement: Element, client: ReactiveClient) : Mono<VictoriaDTO>
-    {
+    private fun getDTOwithGiftOrder(vicDTO: Mono<VictoriaDTO>, siteElement: Element, client: ReactiveClient): Mono<VictoriaDTO> {
         val orderDetailsPageURI = siteElement.child(5).toString().substring(
                 siteElement.child(5).toString().indexOf("\"") + 1,
                 siteElement.child(5).toString().lastIndexOf("\""))
@@ -113,8 +103,7 @@ class IT_WORKS
             orderRows.removeAt(0)
             orderRows.remove(orderRows.last())
 
-            for (e in orderRows)
-            {
+            for (e in orderRows) {
                 val giftName = e.child(1).text().trim()
                 val giftAmount = e.child(2).text().trim()
                 val giftAgencyPrice = e.child(3).text().trim()
