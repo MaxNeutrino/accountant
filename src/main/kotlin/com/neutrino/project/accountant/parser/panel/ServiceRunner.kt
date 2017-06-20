@@ -1,5 +1,6 @@
 package com.neutrino.project.accountant.parser.panel
 
+import com.neutrino.project.accountant.excel.TranslatorReader
 import com.neutrino.project.accountant.parser.ParserService
 import com.neutrino.project.accountant.parser.database.ProfileStore
 import com.neutrino.project.accountant.parser.form.LoginForm
@@ -13,19 +14,21 @@ import java.io.InputStreamReader
 
 object ServiceRunner {
 
-    fun runWithImport(parserService: ParserService, form: LoginForm): Flux<Statistic> {
+    var path = ""
+
+    fun runWithImport(parserService: ParserService, form: LoginForm, sheetName: String): Flux<Statistic> {
         parserService.auth(form)
         ProfileStore.import(parserService)
-        return parserService.statistics()
+        return setTranslators(parserService.statistics(), sheetName)
     }
 
-    fun runWithoutImport(parserService: ParserService, form: LoginForm): Flux<Statistic> {
+    fun runWithoutImport(parserService: ParserService, form: LoginForm, sheetName: String): Flux<Statistic> {
         parserService.auth(form)
-        return parserService.statistics()
+        return setTranslators(parserService.statistics(), sheetName)
     }
 
-    fun runNatashaCrap(parserService: ParserService, credentials: Pair<String, String>): Flux<Statistic> {
-        val authHandler  = (parserService as NatashaService).authHandler
+    fun runNatashaCrap(parserService: ParserService, credentials: Pair<String, String>, sheetName: String): Flux<Statistic> {
+        val authHandler = (parserService as NatashaService).authHandler
         try {
             authHandler.auth(credentials.first, credentials.second)
         } catch (e: Exception) {
@@ -45,6 +48,15 @@ object ServiceRunner {
         }
 
         ProfileStore.import(parserService)
-        return parserService.statistics()
+        return setTranslators(parserService.statistics(), sheetName)
+    }
+
+    private fun setTranslators(statistics: Flux<Statistic>, sheetName: String): Flux<Statistic> {
+        val reader = TranslatorReader(path)
+        reader.readSheet(sheetName)
+        return reader.readTranslator(
+                statistics
+                        .filter { it.pay != 0.0 }
+        )
     }
 }

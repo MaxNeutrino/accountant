@@ -6,9 +6,15 @@ import java.io.File
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-
-
+/**
+ * Wrapper over okhttp
+ *
+ * @see OkHttpClient
+ */
+//TODO('Make external lib')
 class Client(val baseUrl: String, val name: String) {
+
+    //TODO("Simplify")
 
     private val logger = LogManager.getLogger(this)
 

@@ -1,4 +1,4 @@
-package com.neutrino.project.accountant.client.panel.victoria.PROS
+package com.neutrino.project.accountant.parser.panel.victoria.gift
 
 
 import com.neutrino.project.accountant.client.ReactiveClient
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.*
 
-class IT_WORKS(private val client: ReactiveClient) {
+class VictoriaGifts(private val client: ReactiveClient) {
 
     fun getVictoriaDTOs(fromDate: LocalDate, toDate: LocalDate): Flux<VictoriaDTO> {
         //val client = authorize()
@@ -35,20 +35,6 @@ class IT_WORKS(private val client: ReactiveClient) {
 
         return allDTOs.flatMap { it }
     }
-
-    /*private fun authorize() : ReactiveClient
-    {
-        val prop = Properties()
-        prop.load(VictoriaDTO::class.java.getResourceAsStream("/credentials.properties"))
-
-        val client = ReactiveClient(Client(Site.VICTORIA.baseUrl, "vic"))
-        val authService = VictoriaAuthService(VictoriaAuthHttp(client))
-        val form = VictoriaLoginForm(prop.getProperty("login"), prop.getProperty("password"))
-        authService.auth(form)
-
-        return client
-    }*/
-
 
     private fun setDateParams(fromDate: LocalDate, toDate: LocalDate): HashMap<String, String> {
         val map = HashMap<String, String>()

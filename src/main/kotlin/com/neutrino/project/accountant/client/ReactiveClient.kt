@@ -3,7 +3,13 @@ package com.neutrino.project.accountant.client
 import okhttp3.Response
 import reactor.core.publisher.Mono
 
-
+/**
+ * Wrapper over client
+ * All methods wrap Response in Mono
+ *
+ * @see Response
+ * @see Mono
+ */
 class ReactiveClient(val client: Client) {
 
     fun get(url: String): Mono<Response> = Mono.just(client.get(url))

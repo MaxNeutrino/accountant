@@ -10,18 +10,44 @@ data class VictoriaDTO(
         var orderDate: String = "-1",
         var orderItems: MutableList<String> = mutableListOf<String>(),
         var totalPrice: String = "-1"
-)
-{
-    override fun toString(): String
-    {
-        return "operatorId: $operatorId \n" +
-                "operatorEmail: $operatorEmail \n" +
-                "maleName: $maleName \n" +
-                "maleId : $maleId \n" +
-                "femaleName: $femaleName \n" +
-                "femaleId: $femaleId \n" +
-                "orderDate: $orderDate \n" +
-                "orderItems: $orderItems \n" +
-                "totalPrice: $totalPrice \n"
+) {
+
+    /**
+     * For table
+     */
+    override fun toString(): String {
+        //TODO("Replace with normal #toString() when will be refactoring")
+        return "$operatorId\t" +
+                "$operatorEmail\t" +
+                "$maleName\t" +
+                "$maleId\t" +
+                "$femaleName\t" +
+                "$orderDate\t" +
+                "$femaleId\t" +
+                "\t" +                  //empty
+                "\t" +                  // real translator name
+                "\t" +                  // real woman name
+                "${orderItems()}\t" +
+                totalPrice
+    }
+
+    private fun orderItems(): String {
+        val items = StringBuilder("")
+        val prices = StringBuilder("")
+        orderItems.forEach {
+            val itemValues = it.replace(" ", "").split(":")
+            items.append(itemValues[0])
+            items.append(":")
+            items.append(itemValues[1])
+            items.append(" / ")
+
+            prices.append(itemValues[2])
+            prices.append(" / ")
+        }
+
+        items.delete(items.length - 3, items.length -1)
+        prices.delete(prices.length - 3, prices.length -1)
+
+        return "${items.trim()}\t${prices.trim()}"
     }
 }

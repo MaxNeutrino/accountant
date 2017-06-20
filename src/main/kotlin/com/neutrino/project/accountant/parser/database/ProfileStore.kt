@@ -8,7 +8,9 @@ import com.neutrino.project.accountant.parser.model.Site
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-
+/**
+ * Handle in memory profile store
+ */
 object ProfileStore {
 
     private val memory = InMemoryProfileRepositoryImpl

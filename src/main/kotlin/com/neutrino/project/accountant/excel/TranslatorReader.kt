@@ -1,5 +1,6 @@
 package com.neutrino.project.accountant.excel
 
+import com.neutrino.project.accountant.parser.model.Site
 import com.neutrino.project.accountant.parser.model.Statistic
 import com.neutrino.project.accountant.parser.model.Translator
 import com.neutrino.project.accountant.util.exception.ExcelParseException
@@ -10,7 +11,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import reactor.core.publisher.Flux
 import java.io.FileInputStream
 
-
+/**
+ * Read translator table data
+ * Will be replace in future
+ */
 class TranslatorReader(excel: String) {
 
     private val logger = LogManager.getLogger(this)
@@ -41,10 +45,16 @@ class TranslatorReader(excel: String) {
         val translatorsName = readPosition("Переводчик")
 
         return statistics.map {
-            if (it.profile.translator != null)
+
+            if (it.profile.translator != null && it.profile.translator!!.name?.isNotEmpty()!!)
                 return@map it
 
-            val nameValue = if (it.profile.surname == null) it.profile.name!! else it.profile.surname!!
+            var nameValue: String? = if (it.profile.surname == null) it.profile.name else it.profile.surname
+
+            nameValue = nameValue ?: ""
+
+            if (it.profile.site == Site.NATASHA)
+                nameValue = it.profile.siteId
 
             var translatorName = readTranslator(nameValue, translatorsName)
             translatorName = if (translatorName == "Переводчик") "" else translatorName
@@ -87,28 +97,34 @@ class TranslatorReader(excel: String) {
 
     private fun readTranslator(name: String): Pair<Int, Int> {
 
-        if (name.contains(" ")) {
-            val splitedName: List<String> = name.split(" ")
+        try {
+            if (name.contains(" ")) {
+                val splitedName: List<String> = name.split(" ")
 
-            try {
-                if (splitedName.size == 2) {
-                    return profilePosition(splitedName[0])
+                try {
+                    if (splitedName.size == 2) {
+                        return profilePosition(splitedName[0])
 
-                } else if (splitedName.size == 3) {
-                    return profilePosition(splitedName[1])
+                    } else if (splitedName.size == 3) {
+                        return profilePosition(splitedName[2])
+                    }
+
+                } catch(e: ExcelParseException) {
+                    if (splitedName.size == 2) {
+                        return profilePosition(splitedName[1])
+
+                    } else if (splitedName.size == 3) {
+                        return profilePosition(splitedName[2])
+                    }
+
                 }
 
-            } catch(e: ExcelParseException) {
-                if (splitedName.size == 2) {
-                    return profilePosition(splitedName[1])
-
-                } else if (splitedName.size == 3) {
-                    return profilePosition(splitedName[2])
-                }
+            } else {
+                return profilePosition(name)
             }
 
-        } else {
-            return profilePosition(name)
+        } catch(e: ExcelParseException) {
+            return Pair(0, 0)
         }
 
         return Pair(0, 0)

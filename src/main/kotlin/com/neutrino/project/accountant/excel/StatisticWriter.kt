@@ -6,7 +6,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import reactor.core.publisher.Flux
 import java.io.FileOutputStream
 
-
+/**
+ * Write statistic to excel book
+ * Will be replaced in future
+ */
 class StatisticWriter {
 
     val wb = XSSFWorkbook()

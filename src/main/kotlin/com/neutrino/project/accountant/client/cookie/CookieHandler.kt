@@ -14,7 +14,12 @@ import java.io.FileWriter
 import java.net.HttpCookie
 import kotlin.streams.toList
 
-
+/**
+ * Cookie handler save cookie to local storage and restore it
+ *
+ * @see HttpCookie
+ * @see Cookie
+ */
 class CookieHandler {
 
     companion object {
