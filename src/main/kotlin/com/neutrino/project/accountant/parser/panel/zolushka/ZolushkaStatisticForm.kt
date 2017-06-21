@@ -10,8 +10,8 @@ class ZolushkaStatisticForm(dateRange: Pair<LocalDate, LocalDate>, response: Str
     val hiddenParser = Hidden()
 
     init {
-        params.put("ctl00\$PageContentContentPlaceHolder\$txtFromDate", dateRange.first.format(DateUtil.DAY_YEAR_BY_SLASH))
-        params.put("ctl00\$PageContentContentPlaceHolder\$txtToDate", dateRange.second.format(DateUtil.DAY_YEAR_BY_SLASH))
+        params.put("ctl00\$PageContentContentPlaceHolder\$txtFromDate", dateRange.first.format(DateUtil.MONTH_DAY_YEAR_BY_SLASH))
+        params.put("ctl00\$PageContentContentPlaceHolder\$txtToDate", dateRange.second.format(DateUtil.MONTH_DAY_YEAR_BY_SLASH))
         params.put("ctl00\$PageContentContentPlaceHolder\$btnSubmit", "Submit")
         hidden(hiddenParser.parse(response))
     }

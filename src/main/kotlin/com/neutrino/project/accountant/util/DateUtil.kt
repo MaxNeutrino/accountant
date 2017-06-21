@@ -10,6 +10,7 @@ object DateUtil {
     val YEAR = DateTimeFormatter.ofPattern("yyyy")
 
     val DAY_YEAR_BY_SLASH = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val MONTH_DAY_YEAR_BY_SLASH = DateTimeFormatter.ofPattern("MM/dd/yyyy")
     val DAY_YEAR_BY_DOT = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     val YEAR_DAY_BY_DASH = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
