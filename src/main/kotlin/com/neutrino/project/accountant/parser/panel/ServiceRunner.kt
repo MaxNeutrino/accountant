@@ -1,6 +1,6 @@
 package com.neutrino.project.accountant.parser.panel
 
-import com.neutrino.project.accountant.excel.TranslatorReader
+import com.neutrino.project.accountant.excel.TranslatorTableReader
 import com.neutrino.project.accountant.parser.ParserService
 import com.neutrino.project.accountant.parser.database.ProfileStore
 import com.neutrino.project.accountant.parser.form.LoginForm
@@ -52,11 +52,12 @@ object ServiceRunner {
     }
 
     private fun setTranslators(statistics: Flux<Statistic>, sheetName: String): Flux<Statistic> {
-        val reader = TranslatorReader(path)
+        /*val reader = TranslatorTableReader(path)
         reader.readSheet(sheetName)
         return reader.readTranslator(
                 statistics
                         .filter { it.pay != 0.0 }
-        )
+        )*/
+        return Flux.empty()
     }
 }

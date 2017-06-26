@@ -3,13 +3,15 @@ package com.neutrino.project.accountant.parser.model
 
 class Profile {
 
-    var siteId:String
-    var name:String? = null
-    var surname:String? = null
-    var nick:String? = null
-    var site:Site? = null
+    var siteId: String
+    var name: String? = null
+    var surname: String? = null
+    var nick: String? = null
+    var site: Site? = null
     var translator: Translator? = null
 
+    var admin: String = "agency"
+    var percent: Double = 50.0
 
 
     constructor(siteId: String, site: Site) {
@@ -22,7 +24,6 @@ class Profile {
         this.name = name
         this.site = site
     }
-
 
 
     constructor(siteId: String, name: String?, surname: String?, nick: String?, site: Site) {
