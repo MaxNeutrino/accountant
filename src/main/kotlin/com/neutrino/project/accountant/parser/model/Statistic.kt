@@ -3,7 +3,7 @@ package com.neutrino.project.accountant.parser.model
 
 class Statistic {
 
-    val profile: Profile
+    var profile: Profile
     val panelName: String
     var pay: Double
 

@@ -2,6 +2,7 @@ package com.neutrino.project.accountant.parser.database
 
 import com.neutrino.project.accountant.database.jdbi.impl.JdbiProfileRepositoryImpl
 import com.neutrino.project.accountant.database.memory.InMemoryProfileRepositoryImpl
+import com.neutrino.project.accountant.excel.TranslatorTableReader
 import com.neutrino.project.accountant.parser.ParserService
 import com.neutrino.project.accountant.parser.model.Profile
 import com.neutrino.project.accountant.parser.model.Site
@@ -13,11 +14,11 @@ import reactor.core.publisher.Mono
  */
 object ProfileStore {
 
-    private val memory = InMemoryProfileRepositoryImpl
+    val memory = InMemoryProfileRepositoryImpl
 
     init {
-        val profiles = JdbiProfileRepositoryImpl().getAll()
-        memory.saveAll(profiles)
+        //val profiles = JdbiProfileRepositoryImpl().getAll()
+       // memory.saveAll(profiles)
     }
 
     fun get(id: String): Mono<Profile> {
@@ -33,6 +34,6 @@ object ProfileStore {
     }
 
     fun getBySite(site: Site): Flux<Profile> {
-        return getAll().filter{ it.site == site }
+        return getAll().filter { it.site == site }
     }
 }

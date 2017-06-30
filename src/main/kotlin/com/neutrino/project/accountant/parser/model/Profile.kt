@@ -75,7 +75,7 @@ class Profile {
     }
 
     override fun toString(): String {
-        return "Profile(siteId='$siteId', name=$name, surname=$surname, nick=$nick, site=$site, translator=$translator)"
+        return "Profile(siteId='$siteId', name=$name, surname=$surname, nick=$nick, site=$site, translator=$translator, admin='$admin', percent=$percent)"
     }
 
 

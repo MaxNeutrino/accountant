@@ -21,8 +21,10 @@ class StatisticWriter {
         header.createCell(0).setCellValue("ID клиентки")
         header.createCell(1).setCellValue("ФИО клиентки")
         header.createCell(2).setCellValue("Переводчик")
-        header.createCell(3).setCellValue("Админка")
-        header.createCell(4).setCellValue("Заработки")
+        header.createCell(3).setCellValue("Админ")
+        header.createCell(4).setCellValue("Админка")
+        header.createCell(5).setCellValue("Заработки")
+        header.createCell(6).setCellValue("Процент")
     }
 
     fun write(statistic: Flux<Statistic>) {
@@ -35,8 +37,10 @@ class StatisticWriter {
             saveCell(row, 0, checker(it.profile.siteId))
             saveCell(row, 1, "${checker(it.profile.surname)} ${checker(it.profile.name)}")
             saveCell(row, 2, "${checker(it.profile.translator?.name)} ${checker(it.profile.translator?.surname)}")
-            saveCell(row, 3, checker(it.panelName))
-            saveCell(row, 4, it.pay)
+            saveCell(row, 3, checker(it.profile.admin))
+            saveCell(row, 4, checker(it.panelName))
+            saveCell(row, 5, it.pay)
+            saveCell(row, 6, it.profile.percent.toString())
 
             /*row.createCell(0).setCellValue(it.profile.siteId)
             row.createCell(1).setCellValue("${it.profile.surname} ${it.profile.name}")
@@ -51,7 +55,7 @@ class StatisticWriter {
     }
 
     private fun write() {
-        FileOutputStream("D:\\Работа\\workbook.xls").use {
+        FileOutputStream("D:\\workbook.xls").use {
             wb.write(it)
         }
     }

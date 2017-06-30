@@ -73,6 +73,9 @@ class TranslatorTableReader(excel: String) {
                     profile.admin = admin
                     profile.percent = percent.toDouble()
 
+                    if (profile.percent == 0.0)
+                        profile.percent = 50.0
+
                     return@map profile
                 } else {
                     return@map Profile("", cell.stringCellValue, site)

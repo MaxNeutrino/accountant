@@ -51,6 +51,7 @@ object ServiceRunner {
         return setTranslators(parserService.statistics(), sheetName)
     }
 
+    // TODO: refactor - task filter
     private fun setTranslators(statistics: Flux<Statistic>, sheetName: String): Flux<Statistic> {
         /*val reader = TranslatorTableReader(path)
         reader.readSheet(sheetName)
@@ -58,6 +59,6 @@ object ServiceRunner {
                 statistics
                         .filter { it.pay != 0.0 }
         )*/
-        return Flux.empty()
+        return statistics.filter { it.pay != 0.0 }
     }
 }
